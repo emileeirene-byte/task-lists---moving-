@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Living Room: Final Boss</title>
+<style>
+:root{
+  --bg:#111218;--card:#1b1d26;--card2:#242733;--text:#f5f3f7;--muted:#aaa8b4;
+  --accent:#c7a7ff;--accent2:#91e6cf;--warn:#ffd28c;--danger:#ff9aa8;--line:#343746;
+}
+*{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--text);font:16px/1.45 system-ui,-apple-system,Segoe UI,sans-serif}
+main{max-width:760px;margin:auto;padding:18px 16px 100px}
+h1{font-size:28px;margin:4px 0} .sub{color:var(--muted);margin:0 0 18px}
+.top{position:sticky;top:0;background:linear-gradient(var(--bg) 82%,transparent);padding:12px 0 18px;z-index:3}
+.progress{height:15px;background:#292b35;border-radius:99px;overflow:hidden}.bar{height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:.25s}
+.stats{display:flex;justify-content:space-between;color:var(--muted);font-size:13px;margin-top:6px}
+button{font:inherit}.actions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:12px 0}
+.bigbtn{border:0;border-radius:14px;padding:13px;background:var(--accent);color:#17121e;font-weight:800}
+.bigbtn.secondary{background:var(--card2);color:var(--text);border:1px solid var(--line)}
+.keep{background:#171a20;border:1px solid var(--line);border-radius:15px;padding:14px;margin:10px 0 16px}
+.keep b{color:var(--accent2)}
+.phase{background:var(--card);border:1px solid var(--line);border-radius:18px;margin:12px 0;overflow:hidden}
+.phase summary{cursor:pointer;list-style:none;padding:16px;font-weight:800;display:flex;gap:10px;align-items:center}
+.phase summary::-webkit-details-marker{display:none}.phase summary .meta{margin-left:auto;color:var(--muted);font-size:12px;font-weight:600}
+.phase.done{opacity:.58}.phase.done summary{text-decoration:line-through}
+.tasks{padding:0 14px 14px}
+.task{display:flex;gap:12px;padding:11px 4px;border-top:1px solid #2c2f3b;align-items:flex-start}
+.task input{appearance:none;width:25px;height:25px;min-width:25px;border:2px solid #686b79;border-radius:8px;margin:0}
+.task input:checked{background:var(--accent2);border-color:var(--accent2);position:relative}
+.task input:checked:after{content:"✓";color:#10231e;font-weight:900;position:absolute;left:5px;top:0px}
+.task label{cursor:pointer;flex:1}.task input:checked+label{text-decoration:line-through;color:#777b87}
+.break{background:#25231d;border-color:#544b35}.break summary{color:var(--warn)}
+.nextbox{display:none;background:#211b2d;border:1px solid #604e7e;border-radius:18px;padding:18px;margin:12px 0}
+.nextbox.show{display:block}.nextbox small{color:var(--muted)}.nextbox strong{display:block;font-size:20px;margin:6px 0}
+.badge{display:inline-block;font-size:12px;background:#302943;padding:4px 8px;border-radius:99px;color:#d9c6ff}
+.finish{display:none;text-align:center;background:#18251f;border:1px solid #35614e;padding:25px;border-radius:20px;margin-top:18px}.finish.show{display:block}
+.note{font-size:13px;color:var(--muted)} .heat{color:var(--warn)}
+body.gentle .phase:not(.break) .meta:after{content:" • gentle mode";color:var(--accent2)}
+body.gentle .task:nth-child(n+5){opacity:.72}
+</style>
+</head>
+<body>
+<main>
+<section class="top">
+  <div class="badge">LIVING ROOM • FINAL BOSS</div>
+  <h1>Get this room the hell out of here.</h1>
+  <p class="sub">One task at a time. No side quests. No accidental kitchen cleaning.</p>
+  <div class="progress"><div class="bar" id="bar"></div></div>
+  <div class="stats"><span id="pct">0% done</span><span id="remaining">~3 hr 15 min active work</span></div>
+  <div class="actions">
+    <button class="bigbtn" onclick="nextTask()">🎯 What do I do next?</button>
+    <button class="bigbtn secondary" id="gentle" onclick="toggleGentle()">🫠 I feel like shit</button>
+  </div>
+</section>
+
+<div id="nextbox" class="nextbox">
+  <small>DO THIS. ONLY THIS.</small>
+  <strong id="nexttext"></strong>
+  <span class="note" id="nextphase"></span>
+</div>
+
+<div class="keep"><b>🚨 DO NOT PACK:</b> MacBook + charger, lap desk, cup, portable AC, TV, pet beds, router/internet gear, one blanket, one pillow, one candle.</div>
+
+<div id="phases"></div>
+
+<div class="finish" id="finish">
+  <h2>🏆 ROOM DEFEATED</h2>
+  <p>Everything is packed, trash, laundry, moving furniture, couch-to-sell, or Last Out. There is no seventh category called “random shit sitting there.”</p>
+</div>
+</main>
+
+<script>
+const data = [
+["🧰 Setup",10,["Fill a big water bottle and put it somewhere visible.","Turn on the AC before doing anything heroic.","Get tape, Sharpie, trash bag, packing material and boxes.","Label boxes LR-1 Candles + Decor, LR-2 Games + Puzzles, LR-3 Electronics + Misc, LR-4 Linens + Soft Items, LR-5 Household + Misc."]],
+["☠️ Kill the Death Box",18,["Take the black Vanyage bag off the clear tote.","Remove green polka-dot blanket → LR-4.","Remove leopard-print blanket/fabric → LR-4.","Remove turquoise fabric/blanket → LR-4.","Remaining clean soft items → LR-4; dirty clothes → laundry.","Electronics from tote → LR-3.","Household miscellaneous → LR-5.","Trash anything obvious.","Wipe the now-empty clear tote. Do not refill it with chaos."]],
+["💧 BREAK: Cool your mammal body",5,["Drink water.","Sit somewhere cool for five minutes.","Do not turn this break into another chore."]],
+["🛋️ Couch + soft stuff",15,["Choose ONE blanket to keep out.","Choose ONE pillow to keep out.","Collect remaining pillows, blankets and bedding → LR-4.","Loose clothing → laundry.","Tape and label LR-4 if comfortably full. Start LR-4B if needed."]],
+["🕯️ The Great Candle Judgment",35,["Put LR-1 beside the fireplace console.","Work left to right: touch each candle once and decide KEEP or TOSS.","Choose ONE candle to keep out this week.","Wrap kept glass candles individually and stand upright in LR-1.","Gather all long utility lighters together → LR-5.","Gray grooming brush, blue tape, yellow tool and other small non-candle items → LR-5.","Gather every loose paper into one stack. Do not read it.","Put papers in folder/bag marked SORT AFTER MOVE → LR-5.","Patterned pouch and black hard case → LR-5 unless needed."]],
+["🥨 BREAK: Food is now mandatory",12,["Drink water.","Eat an actual snack with some carbs/protein.","Sit in the AC until you feel cooled down.","Do not start a side quest."]],
+["🔥 Finish fireplace console",18,["Colorful stacked containers from center compartment → LR-5.","Plaid fabric → LR-4.","Black device/electronic → LR-3.","Trash tissue and obvious debris.","Check back corners for loose items.","Wipe/vacuum the empty compartment.","Wipe console top.","Only one candle + hand sanitizer may remain on top."]],
+["🧊 BREAK: Victorian AC treatment",5,["Sit directly in the cool air.","Drink some water.","If you feel overheated or worse, extend the break."]],
+["🧱 Cube shelf",22,["Small loose items on top → LR-5.","Spare electronics/tablet → LR-3.","Coil spare black cord.","Pink container → LR-5; papers underneath → SORT AFTER MOVE.","Plastic/stretch wrap → LR-5.","Pull out black fabric cube; check only for liquids/breakables, then pack contents together.","Bottom games → LR-2; miscellaneous → LR-5.","White basket electronics/cords → LR-3; nest empty basket if useful.","Wipe top, cubes and sides. Shelf is DONE."]],
+["🎲 Game + puzzle shelf",35,["Put LR-2 beside the shelf.","Pack board games flat, largest first.","Pack puzzles flat/horizontal where possible.","Pack card games and smaller boxes into gaps.","Loose pieces → labeled zip bag with their game.","When LR-2 is full, tape/label it and start LR-2B.","Pack loose floor games/puzzles too.","Wipe the empty shelves and top."]],
+["🛑 REAL BREAK",15,["Refill water.","Bathroom break.","Eat something if hungry.","Sit in the AC.","Body check: continuing is optional if you feel lousy. This is a valid stopping point."]],
+["🍇 Top of game shelf",12,["Cheez-Its and other food → kitchen.","Grapes → kitchen.","Cups/dishes → kitchen.","Trash → trash.","Electronics → LR-3.","Needed-this-week items → keep-out zone.","Wipe shelf top.","Return immediately. THE KITCHEN IS A TRAP."]],
+["🧹 Floor rescue",18,["Remaining game boxes → LR-2B.","Nutribullet box: packed appliance → staging; empty box → recycling.","Empty miscellaneous tote by category.","Soft items → LR-4; electronics → LR-3; household → LR-5.","Laundry → laundry.","Gray floor blanket → LR-4 unless it is your chosen blanket.","Pick up remaining loose floor objects until you can see floor."]],
+["🪜 Window + ladder corner",18,["Clear black ladder shelves → LR-5 as appropriate.","Clear wooden ladder piece.","Disassemble shelves only if easy.","Put hardware in labeled zip bag and tape it to its furniture.","Clear unrelated stuff from around portable AC.","Untangle unrelated cords → LR-3.","Leave AC, power and exhaust hose operational."]],
+["💧 BREAK: tiny human maintenance",7,["Drink water.","Sit down and cool off.","No new chores. We are landing the plane."]],
+["💻 Electronics",15,["Pack spare chargers and cables → LR-3.","Pack tablets and small electronics not needed this week.","Bundle cables individually so Cable Medusa cannot form.","Keep MacBook charger, TV cables, router/modem gear, internet cables, AC cable and essential phone charger OUT.","Put daily-use cords together in one basket/bag."]],
+["🏠 Build LAST OUT kit",10,["Use the empty clear tote.","Put in one blanket.","Put in one pillow.","MacBook goes in when not being used.","Add MacBook charger and essential chargers.","Add lap desk when finished using it.","Add one candle.","Label tote LAST OUT — DO NOT LOAD.","Keep router, TV, portable AC and pet beds separate."]],
+["🐾 Pet zone",10,["Gather pet toys.","Leave out 2–3 favorites.","Pack remaining toys.","Lift pet beds and vacuum underneath.","Put pet beds back."]],
+["📦 Box audit",18,["Tape every full box.","Label every sealed box.","Finish partially full boxes with matching categories.","Use any empty boxes that remain.","Eliminate mystery open boxes.","Stage sealed boxes together with labels facing outward.","Keep door, walking path, AC and pet beds accessible."]],
+["🧹 Final normal clean",22,["Pick up final trash and take bag out.","Move dishes/food to kitchen.","Move laundry out of living room.","Wipe obviously dirty surfaces.","Vacuum fireplace and console area.","Vacuum cube-shelf and game-shelf areas.","Vacuum window/AC area.","Vacuum around couch and pet beds.","Vacuum center floor and obvious baseboard debris.","STOP. No blinds. No wall washing. No deep-clean nonsense tonight."]]
+.map((x,i)=>({name:x[0],mins:x[1],tasks:x[2],break:x[0].includes("BREAK"),id:i}));
+
+const root=document.getElementById("phases");
+data.forEach(p=>{
+ let d=document.createElement("details"); d.className="phase"+(p.break?" break":""); d.dataset.id=p.id;
+ d.open=p.id===0;
+ d.innerHTML=`<summary><span>${p.name}</span><span class="meta">~${p.mins} min</span></summary><div class="tasks"></div>`;
+ const box=d.querySelector(".tasks");
+ p.tasks.forEach((t,j)=>{
+   let row=document.createElement("div");row.className="task";
+   let id=`t-${p.id}-${j}`;
+   row.innerHTML=`<input type="checkbox" id="${id}" data-mins="${p.mins/p.tasks.length}"><label for="${id}">${t}</label>`;
+   box.appendChild(row);
+ });
+ root.appendChild(d);
+});
+const checks=[...document.querySelectorAll('input[type=checkbox]')];
+const key="livingRoomFinalBossV1";
+function save(){localStorage.setItem(key,JSON.stringify({done:checks.map(x=>x.checked),gentle:document.body.classList.contains("gentle")}));}
+function load(){try{let s=JSON.parse(localStorage.getItem(key)); if(s){checks.forEach((x,i)=>x.checked=!!s.done[i]);if(s.gentle)document.body.classList.add("gentle");}}catch(e){} update();}
+checks.forEach(c=>c.addEventListener("change",()=>{save();update();}));
+function update(){
+ const done=checks.filter(x=>x.checked).length,total=checks.length,p=Math.round(done/total*100);
+ document.getElementById("bar").style.width=p+"%";document.getElementById("pct").textContent=p+"% done";
+ let rem=checks.filter(x=>!x.checked).reduce((a,x)=>a+Number(x.dataset.mins),0);
+ document.getElementById("remaining").textContent=`~${Math.round(rem)} min active work left`;
+ document.querySelectorAll(".phase").forEach(ph=>{let cs=[...ph.querySelectorAll("input")];ph.classList.toggle("done",cs.every(x=>x.checked));});
+ document.getElementById("finish").classList.toggle("show",done===total);
+}
+function nextTask(){
+ const n=checks.find(x=>!x.checked),b=document.getElementById("nextbox");
+ if(!n){b.classList.remove("show");return;}
+ const phase=n.closest(".phase");phase.open=true;n.scrollIntoView({behavior:"smooth",block:"center"});
+ document.getElementById("nexttext").textContent=n.nextElementSibling.textContent;
+ document.getElementById("nextphase").textContent=phase.querySelector("summary span").textContent;
+ b.classList.add("show");
+ setTimeout(()=>b.scrollIntoView({behavior:"smooth",block:"center"}),100);
+}
+function toggleGentle(){document.body.classList.toggle("gentle");document.getElementById("gentle").textContent=document.body.classList.contains("gentle")?"💚 Gentle mode ON":"🫠 I feel like shit";save();}
+load();
+</script>
+</body></html>
